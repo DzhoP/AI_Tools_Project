@@ -60,8 +60,10 @@ class AuthController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
+        // hash_equals = сравнение с постоянно време, не издава информация чрез скоростта на отговора
         $invalid = ! $user
-            || $user->two_factor_code !== $request->code
+            || ! $user->two_factor_code
+            || ! hash_equals($user->two_factor_code, $request->code)
             || ! $user->two_factor_expires_at
             || $user->two_factor_expires_at->isPast();
 

@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { ToastProvider } from "@/components/Toast";
 import { AuthProvider } from "@/hooks/useAuth";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
+// Geist Mono се ползва от font-mono (часовникът в Navbar, 2FA кода).
+// Sans шрифтът на сайта е системен (виж globals.css) — Geist Sans беше зареждан, но неизползван.
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -29,7 +26,7 @@ export default function RootLayout({
     <html
       lang="bg"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistMono.variable} h-full antialiased`}
     >
       <head>
         {/* Прилага темата преди render — иначе тъмната тема "мига" в бяло при зареждане */}

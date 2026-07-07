@@ -16,7 +16,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  /* Sans шрифтът е системният на body по-долу; Geist Sans не се ползваше и беше премахнат */
+  --font-sans: Arial, Helvetica, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 

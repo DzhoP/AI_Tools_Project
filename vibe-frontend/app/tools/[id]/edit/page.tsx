@@ -51,6 +51,19 @@ export default function EditToolPage() {
     );
   }
 
+  // UX проверка — реалната защита е в API-то, но няма смисъл да показваме
+  // форма, чийто запис така или иначе ще бъде отказан с 403
+  const canEdit = !!user && (user.role?.name === 'owner' || tool?.user?.id === user.id);
+  if (tool && !canEdit) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center text-gray-500 dark:text-gray-400">
+        <p className="text-4xl mb-3">🔒</p>
+        <p className="font-medium">Само авторът или Owner може да редактира този инструмент</p>
+        <Link href={`/tools/${id}`} className="mt-4 inline-block text-amber-700 dark:text-amber-400 hover:underline text-sm">← Към инструмента</Link>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">

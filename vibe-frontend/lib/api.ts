@@ -21,6 +21,7 @@ export interface Category {
 export interface Tag {
   id: number;
   name: string;
+  slug: string;
   color: string;
 }
 
@@ -93,6 +94,8 @@ export interface ToolFilters {
   tag?: string;
   search?: string;
   difficulty?: string;
+  /** Само моите инструменти (вкл. чакащи одобрение) */
+  mine?: boolean;
 }
 
 // ─── Core request helper ──────────────────────────────────────────────────────
@@ -110,6 +113,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
   });
 
   if (res.status === 204) return undefined as T;
+
+  // Изтекъл/невалиден token → чистим го и пращаме потребителя към login,
+  // иначе изглежда "логнат", но всяко действие се проваля
+  if (res.status === 401 && token && typeof window !== 'undefined') {
+    localStorage.removeItem('token');
+    window.location.href = '/login';
+  }
 
   const data = await res.json();
 
@@ -143,6 +153,7 @@ export const toolsApi = {
     if (filters?.tag)        params.set('tag', filters.tag);
     if (filters?.search)     params.set('search', filters.search);
     if (filters?.difficulty) params.set('difficulty', filters.difficulty);
+    if (filters?.mine)       params.set('mine', '1');
     const query = params.toString();
     return api.get<AiTool[]>(`/tools${query ? `?${query}` : ''}`);
   },
@@ -157,7 +168,6 @@ export const toolsApi = {
 export const categoriesApi = {
   list: () => api.get<Category[]>('/categories'),
   create: (data: { name: string; color?: string }) => api.post<Category>('/categories', data),
-  delete: (id: number) => api.delete(`/categories/${id}`),
 };
 
 export const rolesApi = {
@@ -167,7 +177,6 @@ export const rolesApi = {
 export const tagsApi = {
   list: () => api.get<Tag[]>('/tags'),
   create: (data: { name: string; color?: string }) => api.post<Tag>('/tags', data),
-  delete: (id: number) => api.delete(`/tags/${id}`),
 };
 
 export const reviewsApi = {

@@ -10,8 +10,11 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function index(AiTool $aiTool): JsonResponse
+    public function index(Request $request, AiTool $aiTool): JsonResponse
     {
+        // Отзивите следват видимостта на инструмента (одобрен / автор / Owner)
+        abort_unless(AiToolController::visibleTo($request, $aiTool), 404, 'Инструментът не е намерен.');
+
         $reviews = $aiTool->reviews()
             ->with('user:id,name,role_id', 'user.role:id,label')
             ->latest()
@@ -22,6 +25,9 @@ class ReviewController extends Controller
 
     public function store(Request $request, AiTool $aiTool): JsonResponse
     {
+        // Отзиви се оставят само на одобрени (публично видими) инструменти
+        abort_unless($aiTool->status === 'approved', 404, 'Инструментът не е намерен.');
+
         $data = $request->validate([
             'rating'  => ['required', 'integer', 'min:1', 'max:5'],
             'comment' => ['nullable', 'string', 'max:2000'],
@@ -35,7 +41,7 @@ class ReviewController extends Controller
 
         return response()->json(
             $review->load('user:id,name,role_id', 'user.role:id,label'),
-            201
+            $review->wasRecentlyCreated ? 201 : 200
         );
     }
 

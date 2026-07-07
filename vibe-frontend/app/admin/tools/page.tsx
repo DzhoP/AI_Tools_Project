@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toolsApi, categoriesApi, rolesApi, AiTool, Category, Role, ToolStatus } from '@/lib/api';
 import { useToast } from '@/components/Toast';
@@ -31,21 +31,21 @@ export default function AdminToolsPage() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
+  // stale-флагът пази от race condition при бързо писане в търсачката
+  useEffect(() => {
+    let stale = false;
     setLoading(true);
-    try {
-      setTools(await toolsApi.list({
-        status,
-        category: category || undefined,
-        role: role || undefined,
-        search: search || undefined,
-      }));
-    } finally {
-      setLoading(false);
-    }
-  }, [status, category, role, search]);
-
-  useEffect(() => { load(); }, [load]);
+    toolsApi.list({
+      status,
+      category: category || undefined,
+      role: role || undefined,
+      search: search || undefined,
+    })
+      .then(data => { if (!stale) setTools(data); })
+      .catch(e => { if (!stale) toast(e instanceof Error ? e.message : 'Грешка при зареждане', 'error'); })
+      .finally(() => { if (!stale) setLoading(false); });
+    return () => { stale = true; };
+  }, [status, category, role, search, toast]);
 
   useEffect(() => {
     Promise.all([categoriesApi.list(), rolesApi.list()])

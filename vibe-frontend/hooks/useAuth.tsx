@@ -9,7 +9,7 @@ interface Role {
   label: string;
 }
 
-interface User {
+export interface User {
   id: number;
   name: string;
   email: string;
@@ -28,6 +28,8 @@ interface AuthContextValue {
   login: (email: string, password: string) => Promise<LoginResponse>;
   verifyTwoFactor: (email: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
+  /** Обновява user-а в контекста (напр. след редакция на профила) */
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -40,9 +42,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = localStorage.getItem('token');
     if (!token) { setLoading(false); return; }
 
+    // Невалиден token се чисти централно в lib/api.ts (401) —
+    // тук не трием при мрежова грешка, за да не убием валидна сесия
     api.get<User>('/user')
       .then(setUser)
-      .catch(() => localStorage.removeItem('token'))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
@@ -58,13 +62,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function logout() {
-    await api.post('/logout', {});
-    localStorage.removeItem('token');
-    setUser(null);
+    try {
+      await api.post('/logout', {});
+    } finally {
+      // Дори API-то да откаже (изтекъл token), локално винаги излизаме
+      localStorage.removeItem('token');
+      setUser(null);
+    }
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, verifyTwoFactor, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, verifyTwoFactor, logout, updateUser: setUser }}>
       {children}
     </AuthContext.Provider>
   );

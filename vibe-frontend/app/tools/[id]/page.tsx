@@ -7,13 +7,8 @@ import ReactMarkdown from 'react-markdown';
 import { toolsApi, AiTool } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { textOn } from '@/lib/color';
+import { DIFFICULTY_LABELS } from '@/lib/difficulty';
 import ToolReviews from '@/components/ToolReviews';
-
-const DIFFICULTY_LABELS = {
-  beginner:     { label: 'Начинаещ',  color: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' },
-  intermediate: { label: 'Среден',    color: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300' },
-  advanced:     { label: 'Напреднал', color: 'bg-red-100 text-red-700 dark:text-red-300' },
-};
 
 export default function ToolDetailPage() {
   const { id } = useParams<{ id: string }>();

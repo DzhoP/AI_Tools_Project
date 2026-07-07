@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, User } from '@/hooks/useAuth';
 
 const inputCls = 'w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500';
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth();
+  const { user, loading, updateUser } = useAuth();
   const router = useRouter();
 
   const [name, setName] = useState('');
@@ -32,7 +32,7 @@ export default function ProfilePage() {
     setError(''); setMessage(''); setSaving(true);
 
     try {
-      await api.put('/user', {
+      const updated = await api.put<User>('/user', {
         name,
         email,
         ...(password ? {
@@ -41,6 +41,8 @@ export default function ProfilePage() {
           password_confirmation: passwordConfirmation,
         } : {}),
       });
+      // Иначе Navbar и Dashboard показват старото име до следващо презареждане
+      updateUser(updated);
       setMessage('Профилът е обновен успешно.');
       setCurrentPassword(''); setPassword(''); setPasswordConfirmation('');
     } catch (err) {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import Link from 'next/link';
 import { reviewsApi, Review } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/Toast';
@@ -36,18 +37,28 @@ export default function ToolReviews({ toolId }: { toolId: number | string }) {
   const [comment, setComment] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleteId, setDeleteId] = useState<number | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   const load = useCallback(() => {
-    reviewsApi.list(toolId).then(setReviews).catch(() => {});
+    reviewsApi.list(toolId)
+      .then(r => { setReviews(r); setLoadError(false); })
+      .catch(() => setLoadError(true));
   }, [toolId]);
 
   useEffect(() => { load(); }, [load]);
 
-  // Ако потребителят вече е оставял отзив — формата се попълва с него
+  // Ако потребителят вече е оставял отзив — формата се попълва с него;
+  // ако вече няма негов отзив (напр. изтрит) — формата се нулира
   useEffect(() => {
     if (!user) return;
     const mine = reviews.find(r => r.user.id === user.id);
-    if (mine) { setRating(mine.rating); setComment(mine.comment ?? ''); }
+    if (mine) {
+      setRating(mine.rating);
+      setComment(mine.comment ?? '');
+    } else {
+      setRating(0);
+      setComment('');
+    }
   }, [reviews, user]);
 
   const myReview = user ? reviews.find(r => r.user.id === user.id) : undefined;
@@ -115,12 +126,14 @@ export default function ToolReviews({ toolId }: { toolId: number | string }) {
         </form>
       ) : (
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-          <a href="/login" className="text-amber-700 dark:text-amber-400 hover:underline">Влез</a>, за да оставиш отзив.
+          <Link href="/login" className="text-amber-700 dark:text-amber-400 hover:underline">Влез</Link>, за да оставиш отзив.
         </p>
       )}
 
       {/* Списък */}
-      {reviews.length === 0 ? (
+      {loadError ? (
+        <p className="text-sm text-red-500 dark:text-red-400 text-center py-4">Отзивите не можаха да се заредят. Опитай да презаредиш страницата.</p>
+      ) : reviews.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-4">Все още няма отзиви — бъди първият!</p>
       ) : (
         <div className="space-y-3">

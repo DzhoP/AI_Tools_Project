@@ -29,7 +29,8 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $allowedRoleIds = Role::whereIn('name', ['backend', 'frontend', 'pm', 'qa', 'designer'])->pluck('id');
+        // Единен източник на истината за само-регистрируемите роли (без 'owner')
+        $allowedRoleIds = Role::whereIn('name', \App\Http\Controllers\Api\AuthController::SELF_REGISTERABLE_ROLES)->pluck('id');
 
         $request->validate([
             'name'     => ['required', 'string', 'max:255'],

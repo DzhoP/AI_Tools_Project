@@ -8,9 +8,10 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/login/verify-2fa', [AuthController::class, 'verifyTwoFactor']);
-Route::post('/register', [AuthController::class, 'register']);
+// throttle:5,1 = максимум 5 опита в минута от един IP — спира brute-force на паролата и 2FA кода
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/login/verify-2fa', [AuthController::class, 'verifyTwoFactor'])->middleware('throttle:5,1');
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
 
 // Public read-only endpoints
 Route::get('/tools', [AiToolController::class, 'index']);
@@ -44,13 +45,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/users', [\App\Http\Controllers\Api\UserController::class, 'index']);
         Route::patch('/tools/{aiTool}/status', [AiToolController::class, 'setStatus']);
         Route::get('/activity', [\App\Http\Controllers\Api\ActivityLogController::class, 'index']);
+
+        // Изтриването е разрушително за всички (pivot записите падат каскадно) — само Owner
+        Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
+        Route::delete('/tags/{tag}', [TagController::class, 'destroy']);
     });
 
-    // Categories — protected write operations
+    // Създаване на категории/тагове е позволено на всеки логнат — ToolForm ги създава inline
     Route::post('/categories', [CategoryController::class, 'store']);
-    Route::delete('/categories/{category}', [CategoryController::class, 'destroy']);
-
-    // Tags — protected write operations
     Route::post('/tags', [TagController::class, 'store']);
-    Route::delete('/tags/{tag}', [TagController::class, 'destroy']);
 });

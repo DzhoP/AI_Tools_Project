@@ -1,18 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { toolsApi, categoriesApi, rolesApi, tagsApi, AiTool, Category, Role, Tag, ToolFilters } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/components/Toast';
 import ConfirmModal from '@/components/ConfirmModal';
 import { textOn } from '@/lib/color';
-
-const DIFFICULTY_LABELS = {
-  beginner:     { label: 'Начинаещ',  color: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' },
-  intermediate: { label: 'Среден',    color: 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300' },
-  advanced:     { label: 'Напреднал', color: 'bg-red-100 text-red-700 dark:text-red-300' },
-};
+import { DIFFICULTY_LABELS } from '@/lib/difficulty';
 
 function ToolCard({ tool, onDelete, canEdit }: { tool: AiTool; onDelete: (id: number) => void; canEdit: boolean }) {
   const diff = DIFFICULTY_LABELS[tool.difficulty];
@@ -106,11 +101,9 @@ function ToolCard({ tool, onDelete, canEdit }: { tool: AiTool; onDelete: (id: nu
                 onError={e => (e.currentTarget.style.display = 'none')} />
             </a>
           ))}
-          {(tool.examples?.length ?? 0) > 0 && (
-            <span className="text-xs text-gray-400 self-center flex-shrink-0">
-              {tool.examples?.length} {tool.examples?.length === 1 ? 'пример' : 'примера'}
-            </span>
-          )}
+          <span className="text-xs text-gray-400 self-center flex-shrink-0">
+            {tool.examples?.length} {tool.examples?.length === 1 ? 'пример' : 'примера'}
+          </span>
         </div>
       )}
 
@@ -158,6 +151,7 @@ export default function ToolsPage() {
   const [roles, setRoles]             = useState<Role[]>([]);
   const [tags, setTags]               = useState<Tag[]>([]);
   const [loading, setLoading]         = useState(true);
+  const [loadError, setLoadError]     = useState('');
   const [filters, setFilters]         = useState<ToolFilters>(() => {
     if (typeof window === 'undefined') return {};
     const p = new URLSearchParams(window.location.search);
@@ -168,13 +162,17 @@ export default function ToolsPage() {
     };
   });
 
-  const loadTools = useCallback(async () => {
+  // stale-флагът пази от race condition: при бързо писане в търсачката
+  // по-бавен стар отговор не бива да презапише по-новите резултати
+  useEffect(() => {
+    let stale = false;
     setLoading(true);
-    try { setTools(await toolsApi.list(filters)); }
-    finally { setLoading(false); }
+    toolsApi.list(filters)
+      .then(data => { if (!stale) { setTools(data); setLoadError(''); } })
+      .catch(e => { if (!stale) setLoadError(e instanceof Error ? e.message : 'Грешка при зареждане'); })
+      .finally(() => { if (!stale) setLoading(false); });
+    return () => { stale = true; };
   }, [filters]);
-
-  useEffect(() => { loadTools(); }, [loadTools]);
 
   useEffect(() => {
     Promise.all([categoriesApi.list(), rolesApi.list(), tagsApi.list()])
@@ -302,6 +300,12 @@ export default function ToolsPage() {
               </div>
             </div>
           ))}
+        </div>
+      ) : loadError ? (
+        <div className="text-center py-16 text-red-600 dark:text-red-400">
+          <p className="text-4xl mb-3">⚠️</p>
+          <p className="font-medium">Грешка при зареждане на инструментите</p>
+          <p className="text-sm mt-1">{loadError}</p>
         </div>
       ) : tools.length === 0 ? (
         <div className="text-center py-16 text-gray-500 dark:text-gray-400">

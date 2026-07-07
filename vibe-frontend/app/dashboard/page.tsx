@@ -19,18 +19,22 @@ export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const [tools, setTools] = useState<AiTool[]>([]);
+  const [myTools, setMyTools] = useState<AiTool[]>([]);
 
   useEffect(() => {
     if (!loading && !user) router.replace('/login');
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (user) toolsApi.list().then(setTools).catch(() => {});
+    if (!user) return;
+    // Отделна заявка с mine=1 — публичният списък не включва
+    // собствените инструменти, които още чакат одобрение
+    toolsApi.list().then(setTools).catch(() => {});
+    toolsApi.list({ mine: true }).then(setMyTools).catch(() => {});
   }, [user]);
 
   if (loading || !user) return null;
 
-  const myTools = tools.filter(t => t.user?.id === user.id);
   const forMyRole = tools.filter(t => t.roles.some(r => r.name === user.role?.name));
 
   return (
@@ -93,7 +97,15 @@ export default function DashboardPage() {
             {myTools.map(tool => (
               <Link key={tool.id} href={`/tools/${tool.id}`}
                 className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 bg-white dark:bg-gray-800 hover:shadow-md transition-shadow">
-                <p className="font-semibold text-gray-900 dark:text-gray-100">{tool.name}</p>
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-semibold text-gray-900 dark:text-gray-100">{tool.name}</p>
+                  {tool.status === 'pending' && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 whitespace-nowrap">⏳ Чака одобрение</span>
+                  )}
+                  {tool.status === 'rejected' && (
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 whitespace-nowrap">✕ Отказан</span>
+                  )}
+                </div>
                 {tool.description && (
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">{tool.description}</p>
                 )}

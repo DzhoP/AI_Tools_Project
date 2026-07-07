@@ -20,7 +20,10 @@ class AiToolController extends Controller
 
         // Публичният списък показва само одобрени; Owner може да филтрира по статус
         $viewer = $request->user('sanctum');
-        if ($viewer?->hasRole('owner') && $request->filled('status')) {
+        if ($viewer && $request->boolean('mine')) {
+            // "Моите инструменти" — авторът вижда своите независимо от статуса (вкл. чакащи одобрение)
+            $query->where('user_id', $viewer->id);
+        } elseif ($viewer?->hasRole('owner') && $request->filled('status')) {
             if ($request->status !== 'all') {
                 $query->where('status', $request->status);
             }
@@ -61,10 +64,10 @@ class AiToolController extends Controller
             'name'              => ['required', 'string', 'max:255'],
             'description'       => ['nullable', 'string'],
             'how_to_use'        => ['nullable', 'string'],
-            'url'               => ['nullable', 'url', 'max:500'],
-            'logo_url'          => ['nullable', 'url', 'max:500'],
-            'documentation_url' => ['nullable', 'url', 'max:500'],
-            'video_url'         => ['nullable', 'url', 'max:500'],
+            'url'               => ['nullable', 'url:http,https', 'max:500'],
+            'logo_url'          => ['nullable', 'url:http,https', 'max:500'],
+            'documentation_url' => ['nullable', 'url:http,https', 'max:500'],
+            'video_url'         => ['nullable', 'url:http,https', 'max:500'],
             'difficulty'        => ['required', 'in:beginner,intermediate,advanced'],
             'is_active'         => ['boolean'],
             'is_free'           => ['boolean'],
@@ -76,8 +79,8 @@ class AiToolController extends Controller
             'tag_ids.*'         => ['integer', 'exists:tags,id'],
             'examples'          => ['array', 'max:10'],
             'examples.*.title'     => ['nullable', 'string', 'max:255'],
-            'examples.*.url'       => ['nullable', 'url', 'max:500'],
-            'examples.*.image_url' => ['nullable', 'url', 'max:500'],
+            'examples.*.url'       => ['nullable', 'url:http,https', 'max:500'],
+            'examples.*.image_url' => ['nullable', 'url:http,https', 'max:500'],
             'examples.*.description' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -96,8 +99,10 @@ class AiToolController extends Controller
         return response()->json($tool->load(['categories', 'roles', 'tags', 'examples', 'user:id,name,role_id', 'user.role:id,label']), 201);
     }
 
-    public function show(AiTool $aiTool): JsonResponse
+    public function show(Request $request, AiTool $aiTool): JsonResponse
     {
+        $this->ensureVisible($request, $aiTool);
+
         $aiTool->loadAvg('reviews', 'rating')->loadCount('reviews');
 
         return response()->json($aiTool->load(['categories', 'roles', 'tags', 'examples', 'user:id,name,role_id', 'user.role:id,label']));
@@ -111,10 +116,10 @@ class AiToolController extends Controller
             'name'              => ['sometimes', 'string', 'max:255'],
             'description'       => ['nullable', 'string'],
             'how_to_use'        => ['nullable', 'string'],
-            'url'               => ['nullable', 'url', 'max:500'],
-            'logo_url'          => ['nullable', 'url', 'max:500'],
-            'documentation_url' => ['nullable', 'url', 'max:500'],
-            'video_url'         => ['nullable', 'url', 'max:500'],
+            'url'               => ['nullable', 'url:http,https', 'max:500'],
+            'logo_url'          => ['nullable', 'url:http,https', 'max:500'],
+            'documentation_url' => ['nullable', 'url:http,https', 'max:500'],
+            'video_url'         => ['nullable', 'url:http,https', 'max:500'],
             'difficulty'        => ['sometimes', 'in:beginner,intermediate,advanced'],
             'is_active'         => ['boolean'],
             'is_free'           => ['boolean'],
@@ -126,8 +131,8 @@ class AiToolController extends Controller
             'tag_ids.*'         => ['integer', 'exists:tags,id'],
             'examples'          => ['array', 'max:10'],
             'examples.*.title'     => ['nullable', 'string', 'max:255'],
-            'examples.*.url'       => ['nullable', 'url', 'max:500'],
-            'examples.*.image_url' => ['nullable', 'url', 'max:500'],
+            'examples.*.url'       => ['nullable', 'url:http,https', 'max:500'],
+            'examples.*.image_url' => ['nullable', 'url:http,https', 'max:500'],
             'examples.*.description' => ['nullable', 'string', 'max:1000'],
         ]);
 
@@ -178,6 +183,26 @@ class AiToolController extends Controller
         Cache::tags(CategoryController::CACHE_TAG)->flush();
 
         return response()->json($aiTool->load(['categories', 'roles', 'tags', 'examples', 'user:id,name,role_id', 'user.role:id,label']));
+    }
+
+    /**
+     * Неодобрените инструменти са видими само за автора и Owner.
+     * Връщаме 404 (не 403), за да не издаваме, че скрит инструмент съществува.
+     */
+    public static function visibleTo(Request $request, AiTool $aiTool): bool
+    {
+        if ($aiTool->status === 'approved') {
+            return true;
+        }
+
+        $viewer = $request->user('sanctum');
+
+        return $viewer && ($viewer->hasRole('owner') || $aiTool->user_id === $viewer->id);
+    }
+
+    private function ensureVisible(Request $request, AiTool $aiTool): void
+    {
+        abort_unless(self::visibleTo($request, $aiTool), 404, 'Инструментът не е намерен.');
     }
 
     private function authorizeOwnership(Request $request, AiTool $aiTool): void

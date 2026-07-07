@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -15,22 +14,18 @@ interface AdminUser {
 }
 
 export default function AdminUsersPage() {
-  const { user, loading } = useAuth();
-  const router = useRouter();
+  // Достъпът (owner-only) се пази от app/admin/layout.tsx — тук няма нужда от втори guard
+  const { user } = useAuth();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (loading) return;
-    if (!user) { router.replace('/login'); return; }
-    if (user.role?.name !== 'owner') { router.replace('/dashboard'); return; }
-
     api.get<AdminUser[]>('/users')
       .then(setUsers)
       .catch(e => setError(e instanceof Error ? e.message : 'Грешка'));
-  }, [user, loading, router]);
+  }, []);
 
-  if (loading || !user || user.role?.name !== 'owner') return null;
+  if (!user) return null;
 
   return (
     <div>
