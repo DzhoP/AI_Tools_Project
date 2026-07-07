@@ -15,7 +15,7 @@ class TwoFactorCodeMail extends Mailable
     public function build(): self
     {
         return $this
-            ->subject('Твой код за вход — VibeCoding')
+            ->subject('Твой код за вход — AI_Tools')
             ->html("<p>Твоят код за вход е:</p><h2>{$this->code}</h2><p>Валиден е 10 минути.</p>");
     }
 }

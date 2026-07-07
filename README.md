@@ -1,4 +1,4 @@
-# VibeCoding — каталог за AI инструменти
+# AI_Tools — каталог за AI инструменти
 
 Уеб приложение за организиране на AI инструменти по категории, тагове и роли в екипа.
 Изградено с **Laravel 13** (API) + **Next.js 16** (frontend) + **MySQL** + **Redis**, изцяло в Docker.
@@ -6,7 +6,7 @@
 ## Структура на проекта
 
 ```
-VIBECODING/
+AI_Tools_Project/
 ├── vibe.project/     ← Laravel backend (API + Blade admin вход)
 ├── vibe-frontend/    ← Next.js frontend
 └── dev-sync.sh       ← помощен скрипт за синхронизация с Docker контейнерите
@@ -20,8 +20,8 @@ VIBECODING/
 
 ```bash
 # 1. Клонирай репото
-git clone https://github.com/<твоя-акаунт>/<име-на-репо>.git
-cd VIBECODING
+git clone https://github.com/DzhoP/AI_Tools_Project.git
+cd AI_Tools_Project
 
 # 2. Създай .env файла на Laravel
 cd vibe.project

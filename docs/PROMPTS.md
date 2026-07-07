@@ -9,7 +9,7 @@
 ## 1. Обща сесия за разработка (bootstrap)
 
 ```
-You are continuing development on the VIBECODING project (see CLAUDE.md for
+You are continuing development on the AI_Tools project (see CLAUDE.md for
 stack, structure and critical Docker sync rules).
 
 Before writing any code:
@@ -31,7 +31,7 @@ beginner. My task for this session:
 ## 2. Нова функционалност
 
 ```
-Task: add a new feature to VIBECODING — <feature name>.
+Task: add a new feature to AI_Tools — <feature name>.
 
 Requirements:
 - <what it should do>
@@ -54,7 +54,7 @@ Ask me your clarifying questions first, then propose a short plan, then build.
 ## 3. Поправка на бъг
 
 ```
-Bug report for VIBECODING:
+Bug report for AI_Tools:
 
 What I did: <steps>
 What I expected: <expected behavior>
