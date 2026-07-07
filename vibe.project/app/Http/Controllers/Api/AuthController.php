@@ -33,12 +33,21 @@ class AuthController extends Controller
             ]);
         }
 
-        // 2FA временно е изключен — вижда се по-долу и в verifyTwoFactor() как се включва обратно
-        $token = $user->createToken('next-app')->plainTextToken;
+        $code = (string) random_int(100000, 999999);
+
+        $user->forceFill([
+            'two_factor_code'       => $code,
+            'two_factor_expires_at' => now()->addMinutes(10),
+        ])->save();
+
+        Mail::to($user->email)->send(new TwoFactorCodeMail($code));
 
         return response()->json([
-            'user'  => $user->load('role'),
-            'token' => $token,
+            'two_factor_required' => true,
+            'email'               => $user->email,
+            // Само за демо/прототип: в local среда кодът се връща директно,
+            // за да не се рови в лог файла. В production това поле НЕ трябва да съществува.
+            'demo_code'           => app()->isLocal() ? $code : null,
         ]);
     }
 

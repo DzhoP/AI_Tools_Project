@@ -15,6 +15,7 @@ Route::post('/register', [AuthController::class, 'register']);
 // Public read-only endpoints
 Route::get('/tools', [AiToolController::class, 'index']);
 Route::get('/tools/{aiTool}', [AiToolController::class, 'show']);
+Route::get('/tools/{aiTool}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'index']);
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/tags', [TagController::class, 'index']);
 Route::get('/roles', fn() => Role::orderBy('label')->get());
@@ -28,6 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Image upload (лого и скрийншоти)
     Route::post('/upload', [\App\Http\Controllers\Api\UploadController::class, 'store']);
+
+    // Отзиви — всеки логнат оставя/обновява своя, трие авторът или Owner
+    Route::post('/tools/{aiTool}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'store']);
+    Route::delete('/reviews/{review}', [\App\Http\Controllers\Api\ReviewController::class, 'destroy']);
 
     // AI Tools — protected write operations (author-or-owner проверка си остава вътре в контролера)
     Route::post('/tools', [AiToolController::class, 'store']);

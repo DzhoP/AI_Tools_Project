@@ -53,4 +53,9 @@ class AiTool extends Model
     {
         return $this->hasMany(ToolExample::class)->orderBy('sort_order');
     }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
 }

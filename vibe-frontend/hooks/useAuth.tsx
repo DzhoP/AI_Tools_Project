@@ -16,10 +16,16 @@ interface User {
   role: Role;
 }
 
+interface LoginResponse {
+  two_factor_required: boolean;
+  email: string;
+  demo_code: string | null;
+}
+
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<LoginResponse>;
   verifyTwoFactor: (email: string, code: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -40,12 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setLoading(false));
   }, []);
 
-  // 2FA временно е изключен на бекенда — login() влиза директно.
-  // verifyTwoFactor() е запазена, за да се включи обратно без промяна тук.
+  // Стъпка 1: имейл + парола → бекендът изпраща 6-цифрен код (2FA)
   async function login(email: string, password: string) {
-    const data = await api.post<{ user: User; token: string }>('/login', { email, password });
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
+    return api.post<LoginResponse>('/login', { email, password });
   }
 
   async function verifyTwoFactor(email: string, code: string) {

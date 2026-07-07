@@ -14,7 +14,9 @@ class AiToolController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = AiTool::with(['categories', 'roles', 'tags', 'examples', 'user:id,name,role_id', 'user.role:id,label']);
+        $query = AiTool::with(['categories', 'roles', 'tags', 'examples', 'user:id,name,role_id', 'user.role:id,label'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews');
 
         // Публичният списък показва само одобрени; Owner може да филтрира по статус
         $viewer = $request->user('sanctum');
@@ -96,6 +98,8 @@ class AiToolController extends Controller
 
     public function show(AiTool $aiTool): JsonResponse
     {
+        $aiTool->loadAvg('reviews', 'rating')->loadCount('reviews');
+
         return response()->json($aiTool->load(['categories', 'roles', 'tags', 'examples', 'user:id,name,role_id', 'user.role:id,label']));
     }
 

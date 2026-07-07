@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import { toolsApi, AiTool } from '@/lib/api';
 import { useAuth } from '@/hooks/useAuth';
 import { textOn } from '@/lib/color';
+import ToolReviews from '@/components/ToolReviews';
 
 const DIFFICULTY_LABELS = {
   beginner:     { label: 'Начинаещ',  color: 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300' },
@@ -161,6 +162,9 @@ export default function ToolDetailPage() {
           </div>
         </section>
       )}
+
+      {/* Reviews */}
+      <ToolReviews toolId={tool.id} />
 
       {/* Tags + author */}
       <div className="border-t border-gray-100 dark:border-gray-700 pt-4 flex flex-wrap items-center justify-between gap-2">

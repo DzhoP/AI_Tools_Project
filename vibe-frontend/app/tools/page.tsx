@@ -35,7 +35,14 @@ function ToolCard({ tool, onDelete, canEdit }: { tool: AiTool; onDelete: (id: nu
             <Link href={`/tools/${tool.id}`}>
               <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate hover:text-amber-700 transition-colors">{tool.name}</h3>
             </Link>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${diff.color}`}>{diff.label}</span>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${diff.color}`}>{diff.label}</span>
+              {tool.reviews_count > 0 && (
+                <span className="text-xs text-amber-600 dark:text-amber-400 font-medium whitespace-nowrap">
+                  ★ {Number(tool.reviews_avg_rating).toFixed(1)} ({tool.reviews_count})
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">

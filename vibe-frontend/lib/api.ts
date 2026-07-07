@@ -32,6 +32,14 @@ export interface ToolExample {
   description: string;
 }
 
+export interface Review {
+  id: number;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  user: { id: number; name: string; role?: { id: number; label: string } };
+}
+
 export interface ToolAuthor {
   id: number;
   name: string;
@@ -57,6 +65,8 @@ export interface AiTool {
   roles: Role[];
   tags: Tag[];
   examples: ToolExample[];
+  reviews_avg_rating: string | null;
+  reviews_count: number;
 }
 
 export interface AiToolPayload {
@@ -158,6 +168,13 @@ export const tagsApi = {
   list: () => api.get<Tag[]>('/tags'),
   create: (data: { name: string; color?: string }) => api.post<Tag>('/tags', data),
   delete: (id: number) => api.delete(`/tags/${id}`),
+};
+
+export const reviewsApi = {
+  list: (toolId: number | string) => api.get<Review[]>(`/tools/${toolId}/reviews`),
+  submit: (toolId: number | string, data: { rating: number; comment: string }) =>
+    api.post<Review>(`/tools/${toolId}/reviews`, data),
+  remove: (id: number) => api.delete(`/reviews/${id}`),
 };
 
 export const uploadApi = {
