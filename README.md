@@ -88,14 +88,14 @@ docker compose exec app php artisan storage:link
 
 Всички с парола `password`:
 
-| Имейл | Роля |
-|---|---|
-| owner@vibe.test | Owner (администратор) |
-| backend@vibe.test | Backend Developer |
-| frontend@vibe.test | Frontend Developer |
-| pm@vibe.test | Project Manager |
-| qa@vibe.test | QA Engineer |
-| designer@vibe.test | Designer |
+| Име | Имейл | Роля |
+|---|---|---|
+| Иван Попов | owner@vibe.test | Owner (администратор) |
+| Георги Веселинов | backend@vibe.test | Backend Developer |
+| Елена Проданова | frontend@vibe.test | Frontend Developer |
+| Симеон Стефанов | pm@vibe.test | Project Manager |
+| Виктор Павлов | qa@vibe.test | QA Engineer |
+| Ралица Калева | designer@vibe.test | Designer |
 
 ---
 

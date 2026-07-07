@@ -13,12 +13,12 @@ class UserSeeder extends Seeder
         $roles = DB::table('roles')->pluck('id', 'name');
 
         $users = [
-            ['name' => 'Owner User',    'email' => 'owner@vibe.test',    'role' => 'owner'],
-            ['name' => 'Backend Dev',   'email' => 'backend@vibe.test',  'role' => 'backend'],
-            ['name' => 'Frontend Dev',  'email' => 'frontend@vibe.test', 'role' => 'frontend'],
-            ['name' => 'Project Manager', 'email' => 'pm@vibe.test',     'role' => 'pm'],
-            ['name' => 'QA Engineer',   'email' => 'qa@vibe.test',       'role' => 'qa'],
-            ['name' => 'Designer',      'email' => 'designer@vibe.test', 'role' => 'designer'],
+            ['name' => 'Иван Попов',        'email' => 'owner@vibe.test',    'role' => 'owner'],
+            ['name' => 'Георги Веселинов',  'email' => 'backend@vibe.test',  'role' => 'backend'],
+            ['name' => 'Елена Проданова',   'email' => 'frontend@vibe.test', 'role' => 'frontend'],
+            ['name' => 'Симеон Стефанов',   'email' => 'pm@vibe.test',       'role' => 'pm'],
+            ['name' => 'Виктор Павлов',     'email' => 'qa@vibe.test',       'role' => 'qa'],
+            ['name' => 'Ралица Калева',     'email' => 'designer@vibe.test', 'role' => 'designer'],
         ];
 
         foreach ($users as $user) {
