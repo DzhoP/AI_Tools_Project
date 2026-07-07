@@ -22,33 +22,8 @@ AI_Tools_Project/
 git clone https://github.com/DzhoP/AI_Tools_Project.git
 cd AI_Tools_Project
 
-# 2. Създай .env файла на Laravel
-cd vibe.project
-cp .env.example .env
-```
-
-Отвори `vibe.project/.env` и задай следните стойности (връзка с Docker контейнерите):
-
-```env
-APP_URL=http://localhost:8000
-
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=vibe_db
-DB_USERNAME=vibe_user
-DB_PASSWORD=secret
-
-SESSION_DRIVER=redis
-CACHE_STORE=redis
-REDIS_HOST=redis
-
-MAIL_MAILER=log
-```
-
-Създай и `.env.local` за frontend-а:
-
-```bash
+# 2. Подготви конфигурационните файлове
+cp vibe.project/.env.example vibe.project/.env
 cp vibe-frontend/.env.local.example vibe-frontend/.env.local
 ```
 
