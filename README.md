@@ -49,7 +49,7 @@ docker compose up -d --build
 След първото стартиране създай таблиците и демо данните:
 
 ```bash
-docker compose exec app php artisan migrate --seed
+docker compose exec app php artisan migrate --seed --force
 docker compose exec app php artisan storage:link
 ```
 
