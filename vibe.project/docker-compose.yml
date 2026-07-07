@@ -97,7 +97,7 @@ services:
       NEXT_PUBLIC_API_URL: http://localhost:8000/api
       WATCHPACK_POLLING: "true"       # надежден HMR при bind mount редакции
       CHOKIDAR_USEPOLLING: "true"
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "npm install --no-package-lock && npm run dev"
     networks:
       - vibe_network
     healthcheck:
