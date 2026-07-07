@@ -53,7 +53,7 @@ export default function LoginPage() {
           {step === 'credentials' ? (
             <>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">Вход</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Влез в своя VibeCoding акаунт</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Влез в своя AI_Tools акаунт</p>
 
               {error && (
                 <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm">

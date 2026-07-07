@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VibeCoding",
-  description: "VibeCoding платформа",
+  title: "AI_Tools",
+  description: "AI_Tools — каталог с AI инструменти за екипа",
 };
 
 export default function RootLayout({

@@ -21,13 +21,8 @@ export default function HomePage() {
       <section className="bg-gradient-to-b from-amber-50 dark:from-gray-900 to-white dark:to-gray-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
-            AI инструментите на екипа —<br className="hidden sm:block" />
-            <span className="text-amber-700 dark:text-amber-400"> на едно място</span>
+            AI инструментите на екипа
           </h1>
-          <p className="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Каталог с проверени AI инструменти, подбрани по роля и категория.
-            Открий кое върши работа за твоята позиция — с инструкции и реални примери от колегите ти.
-          </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/tools"
               className="px-6 py-3 bg-amber-500 text-white font-medium rounded-xl hover:bg-amber-600 transition-colors">

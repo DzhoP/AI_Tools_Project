@@ -33,7 +33,7 @@ function SofiaClock() {
 
   return (
     <div className="hidden md:block text-sm text-gray-500 dark:text-gray-400 text-right leading-tight">
-      <div>София: <span className="font-mono font-medium text-gray-700 dark:text-gray-300">{time}</span></div>
+      <div><span className="font-mono font-medium text-gray-700 dark:text-gray-300">{time}</span></div>
       <div className="font-mono text-xs text-gray-500 dark:text-gray-400">{date}</div>
     </div>
   );
@@ -69,9 +69,9 @@ export default function Navbar() {
         <div className="flex items-center gap-6 min-w-0">
           <Link href="/" className="flex items-center gap-2 flex-shrink-0" onClick={() => setMenuOpen(false)}>
             <div className="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">V</span>
+              <span className="text-white font-bold text-sm">AI</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 dark:text-gray-100 hidden sm:block">VibeCoding</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-gray-100 hidden sm:block">AI_Tools</span>
           </Link>
           <nav className="hidden sm:flex items-center gap-1">
             {visibleItems.map(item => (
