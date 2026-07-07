@@ -8,8 +8,7 @@
 ```
 AI_Tools_Project/
 ├── vibe.project/     ← Laravel backend (API + Blade admin вход)
-├── vibe-frontend/    ← Next.js frontend
-└── dev-sync.sh       ← помощен скрипт за синхронизация с Docker контейнерите
+└── vibe-frontend/    ← Next.js frontend
 ```
 
 ---
@@ -154,4 +153,7 @@ docker compose exec app php artisan cache:clear
 docker compose down
 ```
 
-> **Бележка за Docker Desktop на Linux:** промени по файловете на хоста може да не се синхронизират автоматично към работещите контейнери. Използвай `dev-sync.sh` или `docker cp` след редакция, или рестартирай контейнера.
+> **Забележка:** проектът върви на native Docker Engine — редакциите по файловете на хоста се
+> отразяват в контейнерите в реално време чрез bind mount-ове, без нужда от ръчно копиране.
+> Контейнерът `vibe_app` върви с UID/GID 1001, за да може да пише в bind-mount-натите папки;
+> при различен host UID презапиши `PUID`/`PGID` build-args в `docker-compose.yml`.

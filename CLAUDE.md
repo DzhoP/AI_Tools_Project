@@ -9,24 +9,16 @@ Educational project (Vibecoding academy). Catalog of AI tools organized by categ
 - MySQL 8 + Redis 7, everything runs in Docker (5 containers: vibe_app, vibe_nginx, vibe_mysql, vibe_redis, vibe_nextjs)
 - `docker-compose.yml` lives in `vibe.project/`
 
-## ⚠️ CRITICAL: Docker file sync is broken (host → container)
+## Docker file sync
 
-Docker Desktop on Linux does NOT propagate host file edits into running containers. After **every** file edit you MUST copy it manually:
+Runs on **native Docker Engine** (not Docker Desktop). Host file edits propagate into the
+running containers in real time via bind mounts (`.:/var/www`, `../vibe-frontend:/app`) — no
+`docker cp` needed. Next.js HMR picks up changes (polling enabled). For CSS/config edits that
+Turbopack caches aggressively you may still occasionally need `docker exec vibe_nextjs rm -rf /app/.next && docker restart vibe_nextjs`.
 
-```bash
-# Laravel files
-docker cp vibe.project/<path> vibe_app:/var/www/<path>
-# Next.js files
-docker cp vibe-frontend/<path> vibe_nextjs:/app/<path>
-```
-
-For CSS/config changes in Next.js (globals.css, layout), also clear the Turbopack cache:
-
-```bash
-docker exec vibe_nextjs rm -rf /app/.next && docker restart vibe_nextjs
-```
-
-Files created *inside* containers (e.g. uploads) sync fine between containers. Container restart refreshes the mount from host.
+Note: `vibe_app` (php-fpm) runs as UID/GID **1001** to match the host user, so it can write to
+the bind-mounted `storage/` and `bootstrap/cache/`. If your host UID differs, override the
+`PUID`/`PGID` build args in `docker-compose.yml`.
 
 ## Commands
 

@@ -13,6 +13,14 @@ RUN printf "upload_max_filesize=6M\npost_max_size=10M\n" > /usr/local/etc/php/co
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Пренастройваме www-data да ползва същия UID/GID като host потребителя,
+# за да може php-fpm да пише в bind-mount-натите storage/ и bootstrap/cache.
+# (native Docker Engine запазва host собствеността по bind mount-овете)
+ARG PUID=1001
+ARG PGID=1001
+RUN groupmod -o -g ${PGID} www-data \
+    && usermod  -o -u ${PUID} -g ${PGID} www-data
+
 WORKDIR /var/www
 
 COPY . .
