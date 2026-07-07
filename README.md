@@ -46,9 +46,10 @@ docker compose up -d --build
 | `vibe_redis` | Cache и сесии | 6379 |
 | `vibe_nextjs` | Next.js frontend | **3000** |
 
-След първото стартиране създай таблиците и демо данните:
+След първото стартиране изпълни:
 
 ```bash
+docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate --seed --force
 docker compose exec app php artisan storage:link
 ```
