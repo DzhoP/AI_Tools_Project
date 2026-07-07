@@ -46,10 +46,10 @@ REDIS_HOST=redis
 MAIL_MAILER=log
 ```
 
-Създай и `vibe-frontend/.env.local` с един ред:
+Създай и `.env.local` за frontend-а:
 
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```bash
+cp vibe-frontend/.env.local.example vibe-frontend/.env.local
 ```
 
 ---
