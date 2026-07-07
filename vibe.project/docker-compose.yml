@@ -9,6 +9,7 @@ services:
     restart: unless-stopped
     volumes:
       - .:/var/www
+      - vendor_data:/var/www/vendor
     networks:
       - vibe_network
     healthcheck:
@@ -105,3 +106,4 @@ networks:
 
 volumes:
   vibe_mysql_data:
+  vendor_data:
