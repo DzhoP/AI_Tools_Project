@@ -1,0 +1,157 @@
+# VibeCoding — каталог за AI инструменти
+
+Уеб приложение за организиране на AI инструменти по категории, тагове и роли в екипа.
+Изградено с **Laravel 13** (API) + **Next.js 16** (frontend) + **MySQL** + **Redis**, изцяло в Docker.
+
+## Структура на проекта
+
+```
+VIBECODING/
+├── vibe.project/     ← Laravel backend (API + Blade admin вход)
+├── vibe-frontend/    ← Next.js frontend
+└── dev-sync.sh       ← помощен скрипт за синхронизация с Docker контейнерите
+```
+
+---
+
+## 1. Инсталация
+
+**Изисквания:** Docker (Desktop или Engine) и git.
+
+```bash
+# 1. Клонирай репото
+git clone https://github.com/<твоя-акаунт>/<име-на-репо>.git
+cd VIBECODING
+
+# 2. Създай .env файла на Laravel
+cd vibe.project
+cp .env.example .env
+```
+
+Отвори `vibe.project/.env` и задай следните стойности (връзка с Docker контейнерите):
+
+```env
+APP_URL=http://localhost:8000
+
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=vibe_db
+DB_USERNAME=vibe_user
+DB_PASSWORD=secret
+
+SESSION_DRIVER=redis
+CACHE_STORE=redis
+REDIS_HOST=redis
+
+MAIL_MAILER=log
+```
+
+Създай и `vibe-frontend/.env.local` с един ред:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/api
+```
+
+---
+
+## 2. Стартиране с Docker
+
+От папката `vibe.project`:
+
+```bash
+docker compose up -d --build
+```
+
+Това вдига 5 контейнера:
+
+| Контейнер | Роля | Порт |
+|---|---|---|
+| `vibe_app` | PHP 8.3 / Laravel | — |
+| `vibe_nginx` | Уеб сървър | **8000** |
+| `vibe_mysql` | База данни | 3306 |
+| `vibe_redis` | Cache и сесии | 6379 |
+| `vibe_nextjs` | Next.js frontend | **3000** |
+
+След първото стартиране създай таблиците и демо данните:
+
+```bash
+docker compose exec app php artisan migrate --seed
+docker compose exec app php artisan storage:link
+```
+
+**Готово:**
+- Frontend: http://localhost:3000
+- Laravel (Blade вход): http://localhost:8000
+
+### Демо акаунти
+
+Всички с парола `password`:
+
+| Имейл | Роля |
+|---|---|
+| owner@vibe.test | Owner (администратор) |
+| backend@vibe.test | Backend Developer |
+| frontend@vibe.test | Frontend Developer |
+| pm@vibe.test | Project Manager |
+| qa@vibe.test | QA Engineer |
+| designer@vibe.test | Designer |
+
+---
+
+## 3. Как се добавят инструменти
+
+1. Влез от http://localhost:3000/login
+2. Натисни **„+ Добави"** в навигацията
+3. Попълни формата — задължителни са само **името** и **нивото на трудност**. Останалото е по желание:
+   - линкове (сайт, документация, видео)
+   - описание и „Как се използва" (поддържа **Markdown**)
+   - категории и тагове (могат да се създават директно от формата)
+   - препоръчителни роли
+   - реални примери със скрийншоти — чрез URL или качване на файл (JPG/PNG/WebP до 5MB)
+4. Запази
+
+**Важно:** инструмент, добавен от обикновен потребител, влиза със статус **„Чакащ"** и не се вижда в публичния списък, докато Owner не го одобри от админ панела (**Админ → Инструменти → таб „Чакащи"**). Инструмент, добавен от Owner, се одобрява автоматично.
+
+---
+
+## 4. Ролева система и права
+
+Ролята се избира при регистрация (ролята **Owner не е достъпна** за саморегистрация — задава се само ръчно в базата).
+
+| Действие | Гост | Всяка роля | Owner |
+|---|:---:|:---:|:---:|
+| Разглеждане на одобрени инструменти | ✅ | ✅ | ✅ |
+| Добавяне на инструмент (влиза като „чакащ") | — | ✅ | ✅ (директно одобрен) |
+| Редакция/изтриване на **собствен** инструмент | — | ✅ | ✅ |
+| Редакция/изтриване на **чужд** инструмент | — | — | ✅ |
+| Одобрение/отказ на предложения | — | — | ✅ |
+| Списък с потребители (`/admin/users`) | — | — | ✅ |
+| Одит лог (`/admin/activity`) | — | — | ✅ |
+
+Защитата е на **три нива**:
+1. **Меню** — линковете, за които нямаш права, не се показват (UX)
+2. **Страница** — директен URL без права пренасочва към таблото
+3. **API** — middleware `role:owner` връща `403` при опит без права; това е истинската защита
+
+Одит логът записва кой потребител какво действие е извършил върху кой инструмент (добавяне, редакция, изтриване, одобрение, отказ).
+
+---
+
+## Полезни команди
+
+```bash
+# Логове на всички контейнери
+docker compose logs -f
+
+# Изпълнение на artisan команди
+docker compose exec app php artisan <команда>
+
+# Изчистване на кеша (Redis)
+docker compose exec app php artisan cache:clear
+
+# Спиране
+docker compose down
+```
+
+> **Бележка за Docker Desktop на Linux:** промени по файловете на хоста може да не се синхронизират автоматично към работещите контейнери. Използвай `dev-sync.sh` или `docker cp` след редакция, или рестартирай контейнера.
