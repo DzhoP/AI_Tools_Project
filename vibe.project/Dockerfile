@@ -1,3 +1,10 @@
+FROM node:20-alpine AS vite-builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+
 FROM php:8.3-fpm
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
@@ -24,6 +31,7 @@ RUN groupmod -o -g ${PGID} www-data \
 WORKDIR /var/www
 
 COPY . .
+COPY --from=vite-builder /app/public/build /var/www/public/build
 
 RUN composer install --no-dev --optimize-autoloader
 
