@@ -31,9 +31,8 @@ cp vibe-frontend/.env.local.example vibe-frontend/.env.local
 
 ## 2. Стартиране с Docker
 
-От папката `vibe.project`:
-
 ```bash
+cd vibe.project
 docker compose up -d --build
 ```
 
