@@ -139,17 +139,20 @@ export default function AdminToolsPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right whitespace-nowrap">
-                    {tool.status !== 'approved' && (
-                      <button onClick={() => changeStatus(tool, 'approved')}
-                        className="px-2.5 py-1 text-xs font-medium rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 mr-1">
-                        ✓ Одобри
-                      </button>
-                    )}
-                    {tool.status !== 'rejected' && (
-                      <button onClick={() => changeStatus(tool, 'rejected')}
-                        className="px-2.5 py-1 text-xs font-medium rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60">
-                        ✕ Откажи
-                      </button>
+                    {/* Решението е финално — бутони има само докато инструментът чака одобрение */}
+                    {tool.status === 'pending' ? (
+                      <>
+                        <button onClick={() => changeStatus(tool, 'approved')}
+                          className="px-2.5 py-1 text-xs font-medium rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/60 mr-1">
+                          ✓ Одобри
+                        </button>
+                        <button onClick={() => changeStatus(tool, 'rejected')}
+                          className="px-2.5 py-1 text-xs font-medium rounded bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 hover:bg-red-200 dark:hover:bg-red-900/60">
+                          ✕ Откажи
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-xs text-gray-400">финално</span>
                     )}
                   </td>
                 </tr>

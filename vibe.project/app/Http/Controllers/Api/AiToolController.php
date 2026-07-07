@@ -174,8 +174,16 @@ class AiToolController extends Controller
     public function setStatus(Request $request, AiTool $aiTool): JsonResponse
     {
         // Достъпът е ограничен от 'role:owner' middleware в routes/api.php
+
+        // Решението е финално — статус се сменя само докато инструментът е pending
+        abort_unless(
+            $aiTool->status === 'pending',
+            422,
+            'Инструментът вече е ' . ($aiTool->status === 'approved' ? 'одобрен' : 'отказан') . ' — решението е финално.'
+        );
+
         $data = $request->validate([
-            'status' => ['required', 'in:pending,approved,rejected'],
+            'status' => ['required', 'in:approved,rejected'],
         ]);
 
         $aiTool->update($data);
