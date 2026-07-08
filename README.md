@@ -15,7 +15,10 @@ AI_Tools_Project/
 
 ## 1. Инсталация
 
-**Изисквания:** Docker (Desktop или Engine) и git.
+**Изисквания:**
+- [Docker](https://www.docker.com/get-started/) (Desktop или Engine) — версия 20+
+- [git](https://git-scm.com/)
+- Свободни портове **8000** и **3000**
 
 ```bash
 # 1. Клонирай репото
